@@ -50,25 +50,3 @@
 	 setClassName("CSC470");				// Changing the class name
 	 console.log(computeGrade(89)); 		// Testing printing out the new grade after setting baseline and changing class name
 })();
-
-
-
-
-
-
-
-
-// WORKING BACKUP, DO NOT DELETE! CHECK TELEGRAM PICS FOR RECOVERY
-// (function() {
-// 	function setCurveBaseline(numericParam) {
-// 		let baseline = numericParam;
-// 		function computeGrade(gradeParam) {
-// 			let grade = gradeParam;
-// 			let curved = baseline+(1-baseline/100)*grade; 	
-// 			console.log(curved); 
-// 		}
-// 		return computeGrade;
-// 	}
-// 	 let computeGrade = setCurveBaseline(0);
-// 	 computeGrade(89);
-// })();

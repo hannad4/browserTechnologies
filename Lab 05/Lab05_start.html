@@ -1,0 +1,71 @@
+<!-- 
+File Name:   Lab05_start.html
+My Name:     Daniel Hanna
+Description: This file demonstrates modifying the DOM via the Javascript Browser API, as well as setting event listeners to
+             perform a particular task  
+-->
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Lab05</title>
+    <style>
+      table {
+        margin-left      : 10px;
+      }
+      #swatch {
+        border           : 1px solid black;
+        min-width        : 100px; 
+        height           : 100px; 
+        background-color : rgb(0,0,0);
+      }
+    </style>
+
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>Red:</td>
+        <!-- When the range element is changed, it will trigger an onchange event. When this occurs, 
+          the defined function should occur. The function is defined for each range element as 
+          an IIFE so that no new properties are defined in the global object-->
+
+        <!-- When the onchange event is triggered, the swatch background color should be set to the
+        range values that are set by the user via the sliders. The clr element's innerHTML should be 
+        updated to match the set values -->  
+        <td><input id="R" type="range" value="0" min="0" max="255" onchange = "(function () { 
+        square.style.backgroundColor = 'rgb(' + red.value + ',' + green.value + ',' + blue.value + ')';
+        colorText.innerHTML = '(' + red.value + ',' + green.value + ',' + blue.value + ')'
+        })(); "></td>
+      </tr><tr>
+        <td>Green:</td>
+        <td><input id="G" type="range" value="0" min="0" max="255" onchange = "(function () { 
+        square.style.backgroundColor = 'rgb(' + red.value + ',' + green.value + ',' + blue.value + ')';
+        colorText.innerHTML = '(' + red.value + ',' + green.value + ',' + blue.value + ')'
+        })(); "></td>
+      </tr><tr>
+        <td>Blue:</td>
+        <td><input id="B" type="range" value="0" min="0" max="255" onchange = "(function () { 
+        square.style.backgroundColor = 'rgb(' + red.value + ',' + green.value + ',' + blue.value + ')';
+        colorText.innerHTML = '(' + red.value + ',' + green.value + ',' + blue.value + ')'
+        })(); "></td>
+      </tr><tr>
+        <td colspan='2'>Color: rgb<span id="clr"></span></td>
+      </tr><tr>
+        <td id="swatch" colspan='2'></td>
+      <tr>
+    </table>
+
+<!-- Defining a javascript based script that obtains the necessary elements and stores them in variables -->
+    <script type="text/javascript">
+      let red = document.getElementById('R');     //The red variable will store the range element that contains the R ID
+      let green = document.getElementById('G');   //The green variable will store the range element that contains the G ID
+      let blue = document.getElementById('B');    //The blue variable will store the range element that contains the B ID
+      let square = document.getElementById('swatch'); //The square variable will store the element that contains the swatch ID
+      let colorText = document.getElementById('clr');  //The colorText variable will store the range element that contains the clr ID
+      colorText.innerHTML = "(0,0,0)";  //The colorText should be set to (0,0,0) initially, since no RGB values are initially set
+    </script>
+
+  </body>
+</html>
