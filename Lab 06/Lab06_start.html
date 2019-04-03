@@ -1,0 +1,129 @@
+<!-- 
+File Name: Lab06_start.html
+My Name: Danny Hanna
+Description: This file demonstrates adding SVG elements to the DOM
+and performing actions to the page based off of event listeners 
+-->
+
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Lab06</title>
+	<style>
+		#div1 {
+			border: 1px solid black;
+			width: 600px;
+			margin: 0 auto;  /* center content horizontally */
+		}
+	</style>
+
+</head>
+<body>
+	<div id="div1">
+		<svg id="cvs" width="600" height="500"></svg>
+	</div>
+	<script type="text/javascript">
+    // Wrapping all defined functions in an IIFE to limit global object pollution 
+    (function () {
+    	// Using the pre-defined createSVGElement function as given in the lab instructions
+    	function createSVGElement(tag, attrs, innerHTML) {
+    		let ns = "http://www.w3.org/2000/svg";
+    		let el = document.createElementNS(ns, tag);
+    		for (let attr in attrs) { el.setAttribute(attr, String(attrs[attr])); }
+    			if (innerHTML) { el.innerHTML = innerHTML; }
+    		return el;
+    	}
+
+	// This function will add all the necessary SVG elements to the pre-existing SVG element that is present in the DOM
+	(function init() {
+	// Creating all the circles. Each circle has the innerHTML set to the appropiate value based on its placement	
+	let cir7 = createSVGElement('circle',{cx:"60", cy:"60", r:"30",stroke:"black", fill:"white",id:"cir7"},128); 
+	// Appending the circle as a child of the svg element
+	document.getElementById('cvs').appendChild(cir7);
+
+	let cir6 = createSVGElement('circle',{cx:"130", cy:"60", r:"30",stroke:"black", fill:"white",id:"cir6"},64); 
+	document.getElementById('cvs').appendChild(cir6);
+
+	let cir5 = createSVGElement('circle',{cx:"200", cy:"60", r:"30",stroke:"black", fill:"white",id:"cir5"},32); 
+	document.getElementById('cvs').appendChild(cir5);
+
+	let cir4 = createSVGElement('circle',{cx:"270", cy:"60", r:"30",stroke:"black", fill:"white",id:"cir4"},16); 
+	document.getElementById('cvs').appendChild(cir4);
+
+	let cir3 = createSVGElement('circle',{cx:"340", cy:"60", r:"30",stroke:"black", fill:"white",id:"cir3"},8); 
+	document.getElementById('cvs').appendChild(cir3);
+
+	let cir2 = createSVGElement('circle',{cx:"410", cy:"60", r:"30",stroke:"black", fill:"white",id:"cir2"},4); 
+	document.getElementById('cvs').appendChild(cir2);
+
+	let cir1 = createSVGElement('circle',{cx:"480", cy:"60", r:"30",stroke:"black", fill:"white",id:"cir1"},2); 
+	document.getElementById('cvs').appendChild(cir1);
+
+	let cir0 = createSVGElement('circle',{cx:"550", cy:"60", r:"30",stroke:"black", fill:"white",id:"cir0"},1); 
+	document.getElementById('cvs').appendChild(cir0); 
+
+	// Creating a text SVG element that will store the decimal number. Initialized it to 0 and added it as a child as well
+	let total = createSVGElement('text',{x:"60",y:"130",id:"total"},"0");
+	document.getElementById('cvs').appendChild(total); 
+})();   
+
+
+	// Adding event listeners for each circle so that the toggle function will be activated if any circle is clicked on
+	cir0.onclick = function(ev) {
+		toggle(document.getElementById('cir0')); 
+	}
+
+	cir1.onclick = function(ev) {
+		toggle(document.getElementById('cir1')); 
+	}
+	cir2.onclick = function(ev) {
+		toggle(document.getElementById('cir2')); 
+	}
+	cir3.onclick = function(ev) {
+		toggle(document.getElementById('cir3')); 
+	}
+	cir4.onclick = function(ev) {
+		toggle(document.getElementById('cir4')); 
+	}
+	cir5.onclick = function(ev) {
+		toggle(document.getElementById('cir5')); 
+	}
+	cir6.onclick = function(ev) {
+		toggle(document.getElementById('cir6')); 
+	}
+	cir7.onclick = function(ev) {
+		toggle(document.getElementById('cir7')); 
+	}
+
+	// creating the toggle element function. 
+	function toggle(element){
+		// If the circle has a white fill when being clicked, it should be changed to green
+		// If the circle does not have a white fill when being clicked (it is green), it should be changed to white
+		if(element.getAttribute('fill') == "white"){
+			element.setAttribute('fill', "green"); 
+		}
+		else {
+			element.setAttribute('fill',"white"); 
+		}
+
+		// The update element function should triggered so that the total may be updated
+		update(element); 
+	} 
+
+	// The update element function will update the decimal representation of the toggled circles
+	function update(element){
+		// If the circle has a green fill, then that circle's value needs to be added to the total
+		if(element.getAttribute('fill') == "green") {
+			document.getElementById('total').innerHTML = Number(element.innerHTML) + Number(document.getElementById('total').innerHTML); 
+		}
+		// If the circle has a non-green fill (it is white), then that value needs to be subtracted from the total
+		else{
+			document.getElementById('total').innerHTML = Number(document.getElementById('total').innerHTML) - Number(element.innerHTML);
+		}
+	} 
+})(); 
+
+</script>
+</body>
+</html>

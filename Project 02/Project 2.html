@@ -1,0 +1,139 @@
+<!-- 
+File Name: Project2.html
+My Name: Danny Hanna
+Description: This file acts as a color matching game by modifying elements in the DOM 
+-->
+
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Project2</title>
+		<style> /*applying some styling to help with the grid setup*/
+			.grid {
+				display: grid;
+				grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px;
+				grid-template-rows: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px;
+				grid-gap: 2px;
+
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				-webkit-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+			}
+			.cell {
+				background-color: gray;
+				padding: 5px;
+			}
+		</style>
+	</head>
+
+	<body id = "body">
+		<h1 id = "message" align = "center">Match the Tiles!</h1>
+		<div id = "board" class = grid>
+			<!-- elements will be inserted here  -->
+		</div>
+		<script type="text/javascript">
+			let game = (function(){
+				// Creating colors array that will hold all the colors of the cells
+				let colors = []; 
+				// The listeners array will keep track of the event listeners used
+				let listeners = [null, null]; 
+				// The match variable will keep track of matches
+				let match = 0; 
+				// The timer variable will track how long to show/clear visuals
+				let timer = 0; 
+
+				// Setting up colors (making sure they are even numbers so that matching can be done without stray colors with no match)
+				for(let i = 0; i < 20; i++){ 
+					colors[i] = 'red';
+          		}
+          		for(let i = 20; i < 40; i++){
+            		colors[i] = 'hotpink';
+          		}
+		        for(let i = 40; i < 60; i++){
+		        	colors[i] = 'purple';
+		        }
+		        for(let i = 60; i < 80; i++){
+		            colors[i] = 'green';
+		        }
+		        for(let i = 80; i < 100; i++){
+		            colors[i] = 'brown';
+		        }
+
+
+		    // This is the Fisher-Yates shuffle algorithm, an algorithm commonly used for shuffling arrays. 
+		    // It goes through the given array in reverse order and swaps each element with a random one before it
+		    let randomize = function(array) { 
+		    	for (let i = array.length-1; i>0; i--){
+		    		let j = Math.floor(Math.random()*(i+1)); 
+		    		[array[i], array[j]] = [array[j],array[i]];  
+		    	}
+		    	return array;
+		    }
+		    // The colors array can now be reassigned to its randomized self
+		    colors = randomize(colors); 
+		    
+		    let initialClick = function(clickEvent){
+		    	// No cells have been selected, so the clickEvent should apply to the first clicked cell
+		    	if(listeners[0] === null && listeners[1] === null){
+		    		listeners[0] = clickEvent.target; 
+		    		clickEvent.target.style.backgroundColor = clickEvent.target.underColor; // Reveal the color
+		    		return; 
+		    	}
+		    	// One cell has been selected, so the clickEvent should apply to the second clicked cell
+		    	else if(listeners[0] !== null && listeners[1] === null){
+		    		if(listeners[0] === clickEvent.target){
+		    			return; 
+		    		}
+		    		listeners[1] = clickEvent.target; 
+		    		clickEvent.target.style.backgroundColor = clickEvent.target.underColor; // Reveal the color
+		    		if(listeners[0].underColor === listeners[1].underColor){	// If both cells match color, then the event listener is no longer needed
+		    			listeners[0].removeEventListener('mouseup',initialClick); 
+		    			listeners[1].removeEventListener('mouseup',initialClick); 
+		    			listeners = [null,null]; 
+		    			match++; // Increment the match variable to keep trach of how many matches have been completed (out of 50)
+
+		    			if(match == 50){ // When match is equal to 50, then the instructions message can be updated to say you win 
+		    				let winMessage = document.getElementById('message'); 
+		    				winMessage.innerHTML = "You Win!"; 
+		    			}
+		    		}
+		    		else{
+		    			let reset = function(){	// If no match is found, then the color can be reset to gray, and so can the listeners (for the next cycle) 
+		    				listeners[0].style.backgroundColor = 'gray'; 
+		    				listeners[1].style.backgroundColor = 'gray'; 
+		    				listeners = [null, null]; 
+		    			}
+		    			timer = setTimeout(reset, 1000); // The cells will reset after 1 second of showing the color
+		    		}
+		    	}
+		    	else if(listeners[0] !== null && listeners[1] !== null && listeners[0] !== clickEvent.target && listeners[1] !== clickEvent.target){
+		    		clearTimeout(timer); // If the user tries to click a third item before timeout, the timer should reset and the cells should change bacy to gray 
+		    		listeners[0].style.backgroundColor = 'gray'; 
+		    		listeners[1].style.backgroundColor = 'gray';
+		    		listeners = [clickEvent.target, null]; // The new first listener item will be the third item that the user had clicked
+		    		clickEvent.target.style.backgroundColor = clickEvent.target.underColor; // The color of the third element the user clicked should be shown 
+		    		return; 
+		    	}
+		    	else{
+		    		return; 
+		    	}
+		    }
+		    for(let i = 0; i<100; i++){		// Building the game board through this for loop 
+		    	let div = document.createElement('div'); 	// Board will be built using div elements
+		    	div.setAttribute('class','cell'); 
+		    	document.getElementById('board').appendChild(div); 
+		    }
+		    let status = document.getElementById('board'); // Adding all the event listeners for each game board spot
+		    for(let i = 0; i < 100; i++){
+		    	status.children[i].addEventListener('mouseup', initialClick); 
+		    	status.children[i].underColor = colors[i]; 		// Adding the colors to each cell (already randomized from before)
+		    }
+
+			})(); 
+
+
+		</script>
+	</body>
+</html>
