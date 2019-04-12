@@ -1,0 +1,180 @@
+<!-- 
+File Name: Project3_start.html
+My Name: Danny Hanna
+Description: This file demonstrates manipulating the DOM to visually depict numerical data provided in the form of a JS file 
+-->
+
+<!doctype html>
+<html>
+    <head>
+        <title>Hurricane Viewer</title>
+        <style>
+            #div1 {
+              border: 1px solid black;
+              width : 1275px;
+              margin: 0 auto;  /* center content horizontally */
+            }
+            #sel1 {
+                font-family: Arial;
+                font-size  : 24px; 
+                position   : absolute;
+
+            }
+        </style>
+        <script type="text/javascript" src="hurricaneData.js"></script>
+    </head>
+    <body>
+        <div id="div1">
+            <select id="sel1">
+                <option value="">(Select Hurricane)</option>
+                <option value="DEAN">Dean</option>
+                <option value="HARVEY">Harvey</option>
+                <option value="IRMA">Irma</option>
+                <option value="KATRINA">Katrina</option>
+                <option value="MARIA">Maria</option>
+                <option value="SANDY">Sandy</option>
+            </select> 
+            <svg id="cvs" width="1275" height="825">
+                <image xlink:href="chart_1275x825.png" x=0 y=0 style="border: 1px solid black;"></image>
+            </svg>
+        </div>
+
+        <script type="text/javascript"> 
+        	(function() {		// Wrapping all code in an IIFE (hurricane data should not be wrapped)
+        	let menu = document.getElementById('sel1'); 	// Defining a variable that will keep track of which hurricane is selected
+
+        	function resetMap() {		// Creating a function that will clear up the map 
+        		while (document.getElementById('cvs').lastChild.innerHTML === "circle") { // Only elements with innerHTMl of circle should be removed
+        			document.getElementById('cvs').removeChild(document.getElementById('cvs').lastChild); // Deleting the last element continuously will eventually get rid of all the children 
+        		} 
+        	}
+
+        	function drawOnMap(specificData) {		// Creating a function that will draw the circles given data
+
+        				// The number of circles drawn should match the number of data points given for a hurricane
+        				for (let i = 0; i < specificData.length - 1; i++) {		
+        					let circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle'); 	// Creating a circle element
+
+        					// Converting the latitude and longitude of each point to pixels (using pre-defined function given to us)
+        					let coordinate = ll2xy(parseFloat(specificData[i].latitude), parseFloat(specificData[i].longitude));  
+        					
+							// Setting the center of each circle to be the pixel values found
+        					circle.setAttributeNS(null, 'cx', coordinate.x); 
+        					circle.setAttributeNS(null, 'cy', coordinate.y); 
+
+        					// If any of the radii for each speed value is less than 0, set it to 1 (so that a circle can be drawn)
+        					if(specificData[i].radii34kt[0] < 0) {		// Only using the first quadrant of each radii value
+        						specificData[i].radii34kt[0] = 1; 
+        					}
+        					if (specificData[i].radii50kt[0] < 0) {
+        						specificData[i].radii50kt[0] = 1; 
+        					}
+        					if (specificData[i].radii64kt[0] < 0) {
+        						specificData[i].radii64kt[0] = 1; 
+        					}
+
+        					// I decided to using the first quadrants of each radii summed together and divided by a constant number
+        					// for the radius. Doing this resulted in pretty good scaling when drawing on the map
+        					circle.setAttributeNS(null, 'r', (specificData[i].radii34kt[0] + specificData[i].radii50kt[0] + specificData[i].radii64kt[0])/9); 
+
+        					// If the wind speed qualifies the hurricane as category one for that data point, the color will be set to green
+        					if (specificData[i].windMax >= 64 && specificData[i].windMax <= 82) {
+        						circle.setAttributeNS(null, 'fill', `rgb(0, 255, 0)`); 
+        					}
+
+        					// If category 2, the color will be yellow
+        					else if (specificData[i].windMax >= 83 && specificData[i].windMax <= 95) {
+        						circle.setAttributeNS(null, 'fill', `rgb(255, 255, 0)`); 
+        					}
+
+        					// If category 3, the color will be orange
+        					else if (specificData[i].windMax >= 96 && specificData[i].windMax <= 112) {
+        						circle.setAttributeNS(null, 'fill', `rgb(255, 165, 0)`); 
+        					}
+
+        					// If category 4, the color will be dark yellow
+        					else if (specificData[i].windMax >= 113 && specificData[i].windMax <= 136) {
+        						circle.setAttributeNS(null, 'fill', `rgb(200, 200, 0)`); 
+        					}
+
+        					// If category 5, the color will be red
+        					else if (specificData[i].windMax >= 137) {
+        						circle.setAttributeNS(null, 'fill', `rgb(255, 0, 0)`); 
+        					}
+
+        					// If not strong enough to be any category, the color will be gray 
+        					else {
+        						circle.setAttributeNS(null, 'fill', `rgb(220, 220, 220)`);
+        					}
+
+        					circle.setAttributeNS(null, 'fill-opacity', .45); // Changing the opacity so map can be seen behind circles
+        					circle.setAttributeNS(null, 'stroke', 'black');   // Creating a black border to help distinguish the circles
+
+        					// Defining the innerHTML to be 'circle'. This will help with deleting circles on a reset
+        					circle.innerHTML = "circle"; 
+        					cvs.appendChild(circle);  // Adding a circle as the child to the cvs element
+        				}
+        	}
+
+        	menu.onchange = function selection() {  // Adding a listener that checks for when menu selection is changed
+        		switch(menu.value) {			// Defining case statements for each selection
+        			case "DEAN": // When DEAN is selected, the map should be reset first 
+        				resetMap();
+        				drawOnMap(hurricaneData["DEAN"]); // The hurricane data of DEAN should be used to draw on the map
+        				break; 
+
+        			case "HARVEY": 		// Process is repeated for other hurricanes
+        				resetMap(); 
+        				drawOnMap(hurricaneData["HARVEY"]); 
+        				break; 
+
+        			case "IRMA":
+        				resetMap(); 
+        				drawOnMap(hurricaneData["IRMA"]); 
+        				break; 
+
+        			case "KATRINA": 
+        				resetMap(); 
+        				drawOnMap(hurricaneData["KATRINA"]); 
+        				break;
+
+        			case "MARIA":
+        				resetMap(); 
+        				drawOnMap(hurricaneData["MARIA"]); 
+        				break; 
+
+        			case "SANDY":
+        				resetMap(); 
+        				drawOnMap(hurricaneData["SANDY"]); 
+        				break; 
+
+        			default: 		// If no hurricane is selected, then that means (select hurricane) is chosen
+        				resetMap(); // In this case, the map just needs to be reset. Nothing needs to be drawn on it. 
+        		} 	   
+        	}
+
+        	// The predefined function that converts latitude and longitude to pixels is below (comments pre-provided)
+            // Convert latitude-longitude to pixel coordinates
+            function ll2xy(latitude, longitude) {
+                let minx = 38;      // Minimum chart x-pixel coordinate
+                let maxx = 1237;    // Maximum chart x-pixel coordinate
+                let miny = 42;      // Minimum chart y-pixel coordinate
+                let maxy = 718;     // Maximum chart y-pixel coordinate
+
+                // Chart latitude and longitude extents
+                let minlon = 22;    // Minimum chart longitude
+                let maxlon = 99;    // Maximum chart longitude
+                let minlat = 7;     // Minimum chart latitude
+                let maxlat = 45;    // Maximum chart latitude
+
+                // Convert latitude and longitude to pixel coordinates
+                let x = (maxlon-longitude)/(maxlon-minlon) * (maxx-minx) + minx;
+                let y = (maxlat-latitude)/(maxlat-minlat) * (maxy-miny) + miny;
+
+                // Return coodinates as an object
+                return {x:x, y:y};
+            }
+        })(); 	// Finish wrapping all of the code into an IIFE
+        </script>
+    </body>
+</html>
