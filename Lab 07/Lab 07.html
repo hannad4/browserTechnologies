@@ -1,0 +1,66 @@
+<!-- 
+My Name: Daniel Hanna
+File Name: Lab 07.html
+Description: This file demonstrates using event listeners to detect a mouse click on a canvas element, as well as how to draw on 
+             the canvas element
+ -->
+
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Lab 07</title>
+  </head>
+  <body>
+    <canvas id="cvs" width="1350" height="625"></canvas>
+    <script type="text/javascript">
+      (function() {           // Wrapping everything in an IIFE
+      const cvs = document.getElementById('cvs');   // setting a variable to be equal to the canvas element
+
+      function getMousePos(cvs, evt) {            // Using the given getMousePos() function as provided in lecture slides
+        let rect = cvs.getBoundingClientRect();   // Using getBoundingClientRect() and offset to return the mouse position
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+
+      function drawStar(cx, cy, radius, npoints, ctx) {   // Creating the drawStar function as outlined at end of lecture 7 slides
+        let delta = 360/(2*npoints);        // Defining a delta
+        let theta = -90;                // Defining a theta (initialized to -90 as mentioned in slides)
+        let counter = 0;              // Defining a simple counter variable (used in foor loop)
+        let r = radius;             // Defining a variable r that is equal to the passed in radius
+        let x = radius * Math.cos(theta * Math.PI/180) + cx;      // Converting the cylindrical coordinates to cartesian (for x)
+        let y = radius * Math.sin(theta * Math.PI/180) + cy;      // Converting the cylindrical coordinates to cartesian (for y)
+        let redValue = Math.floor(Math.random()*Math.floor(256));   // Defining a redValue variable that will hold an integer between 0-255
+        let greenValue =  Math.floor(Math.random()*Math.floor(256));    // Defining greenValue variable that will hold integer between 0-255
+        let blueValue = Math.floor(Math.random()*Math.floor(256));      // Defining a blueValue variable that will hold integer between 0-255
+        ctx.beginPath();                          // Initializing the path for drawing on the canvas
+        ctx.moveTo(x, y);                 // Moving to the converted coordinates
+        for(counter = 0; counter < 2* npoints; counter++) {       // Creating for loop (as outlined in slides)
+          theta = theta + delta;            // Incrementing the theta variable by delta
+          if(counter % 2 === 0) {         // If the counter is even, r should be half of the radius
+            r = 0.5*radius; 
+          }
+          else{               // If counter is not even (it is odd), r should be equal to radius
+            r = radius; 
+          }
+          x = r * Math.cos(theta * Math.PI/180) + cx;     // Finding the next coordinates to move to (because theta is now changed)
+          y = r * Math.sin(theta * Math.PI/180) + cy;
+          ctx.lineTo(x,y);            // Drawing a line from current location to the new location
+        }
+        ctx.closePath();        // Closing the path after the for loop (to complete the star)
+        ctx.stroke();           // Outlining the newly drawn star
+        ctx.fillStyle = `rgb(${redValue},${greenValue},${blueValue})`;  // Setting the fill style to be a random rgb value
+        ctx.fill();         // Filling the newly drawn star
+      }
+
+      cvs.onclick = function(evt) {       // When the canvas is clicked on, the mouse position needs to be obtained
+        let pos = getMousePos(cvs, evt);    // Use the getMousePos function to return the x and y positions
+        drawStar(pos.x, pos.y, 25, 5, cvs.getContext('2d'));   // Invoke the drawStar method to draw the star onto the canvas
+      }
+    })(); 
+    
+    </script>
+  </body>
+</html>
