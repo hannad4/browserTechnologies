@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Lab08</title>
+</head>
+<body>
+	<script type="text/javascript">
+	(function () { 
+		let urls = ['p1.html', 'p2.html', 'p3.html'];
+
+		let xhr = new XMLHttpRequest();
+		
+		xhr.open('GET', urls[0]);
+		xhr.onload = function(content) {
+			document.body.innerHTML += content.target.responseText;
+			xhr = new XMLHttpRequest(); 
+			xhr.open('GET', urls[1]); 
+			xhr.onload = function(content) {
+				document.body.innerHTML += content.target.responseText; 
+				xhr = new XMLHttpRequest(); 
+				xhr.open('GET', urls[2]); 
+				xhr.onload = function(content) {
+					document.body.innerHTML += content.target.responseText; 
+					console.log("done");
+				} 
+				xhr.send(); 
+			}
+			xhr.send();  
+		};
+		xhr.send(); 
+
+	})(); 
+		
+
+	</script>
+</body>
+</html>
