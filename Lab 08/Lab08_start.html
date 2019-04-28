@@ -1,3 +1,9 @@
+<!-- 
+My Name: Daniel Hanna
+File Name: Lab 08_start.html
+Description: This file demonstrates the use of XMLHttpRequests with two styles of asynchronous programming (CPS and async/await)
+ -->
+
 <!doctype html>
 <html>
 <head>
@@ -6,33 +12,60 @@
 </head>
 <body>
 	<script type="text/javascript">
-	(function () { 
-		let urls = ['p1.html', 'p2.html', 'p3.html'];
+	(function () { 						// Wrapping everything into an IIFE
+		let urls = ['p1.html', 'p2.html', 'p3.html'];		// Defining an array that houses the filenames of the files I am concerned with
+		let xhr = new XMLHttpRequest();						// Creating a new variable that is an instance of an XHR object
 
-		let xhr = new XMLHttpRequest();
-		
-		xhr.open('GET', urls[0]);
-		xhr.onload = function(content) {
-			document.body.innerHTML += content.target.responseText;
-			xhr = new XMLHttpRequest(); 
-			xhr.open('GET', urls[1]); 
-			xhr.onload = function(content) {
-				document.body.innerHTML += content.target.responseText; 
-				xhr = new XMLHttpRequest(); 
-				xhr.open('GET', urls[2]); 
-				xhr.onload = function(content) {
-					document.body.innerHTML += content.target.responseText; 
-					console.log("done");
-				} 
-				xhr.send(); 
+		function makeRequest(method, url) {		// Creating function called makeRequest
+			return new Promise(function (resolve, reject) {		// function will return the result of a promise function
+				xhr = new XMLHttpRequest(); 			// Initiating a new instance of an xhr object
+				xhr.open(method, url); 			// invoking the get method of the url passed into the function
+				xhr.onload = function () {		// onload, the response of the xhr object will be resolved
+					resolve(xhr.response); 
+				};
+				xhr.onerror = function() {		// onerror, the statusText of xhr will be returned
+					return xhr.statusText; 
+				}  
+				xhr.send(); 				// send the resource request regarding whatever url was passed into this function
+			})
+		}
+
+		async function usingPromises(urls) {		// Creating an asynchronous function that will use a Promise to return the result
+			let result; 						// Creating a variable called result
+			try { 
+			result = await makeRequest("GET", urls[0]); // Set result equal to whatever makeRequest() will return concerning p1.html only after it has been resolved or rejected
+			document.body.innerHTML += result;  // Append the result to the document body (which contains p1, p2, and p3 from before)
+			result = await makeRequest("GET", urls[1]); 	// Repeat procedure for p2.html and p3.html
+			document.body.innerHTML += result; 
+			result = await makeRequest("GET", urls[2]); 
+			document.body.innerHTML += result; 
+			} catch(url) {						// Output that the url was not found if the url specified does not exist
+				console.log(url + " not found");
 			}
-			xhr.send();  
+		}
+
+		xhr.open('GET', urls[0]);						// Invoking the open method with the url 'p1.html'
+		xhr.onload = function(content) {		// onload, this function will be invoked
+			document.body.innerHTML += content.target.responseText;		// Adding the contents of p1.html to the document body
+			xhr = new XMLHttpRequest(); 				// Initiating a new instance of an XHR object
+			xhr.open('GET', urls[1]); 			// Invoking the open method with the url of 'p2.html'
+			xhr.onload = function(content) {			// onload, this function will be invoked
+				document.body.innerHTML += content.target.responseText; 	// Adding the contents of p2.html to the document body (which now also contains the contents of p1.html)
+				xhr = new XMLHttpRequest();   // Initiating a new instance of an XHR object
+				xhr.open('GET', urls[2]); 		// Invoking the open method with the url of 'p3.html'
+				xhr.onload = function(content) {	// Onload, this funciton will be invoked
+					document.body.innerHTML += content.target.responseText; 	// Adding the contents of p3.html to document body (which now containts the contents of p1.html and p2.html)
+					usingPromises(urls);			// Invoking the usingPromises() method (defined above) to redo this using async/await
+				} 
+				xhr.onerror = function() { return xhr.statusText; }		// onerror, the statusText property of xhr will be returned (regarding p3)
+				xhr.send(); 	// send the resource request concerning p3.html
+			}
+			xhr.onerror = function() { return xhr.statusText; }	// onerror, the statusText property of xhr will be returned (regarding p2)
+			xhr.send();  // send the resource request concerning p2.html
 		};
-		xhr.send(); 
-
-	})(); 
-		
-
+		xhr.onerror = function() { return xhr.statusText; }		// onerror, the statusText property of xhr will be returned (regarding p1)
+		xhr.send(); 	// send the resource request concerning p1.html
+	})(); 	// Finishing wrapping everything in an IIFE
 	</script>
 </body>
 </html>
