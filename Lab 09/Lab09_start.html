@@ -2,19 +2,19 @@
 My Name: Daniel Hanna
 File Name: Lab 09_start.html
 Description: This file demonstrates the use of array methods map and reduce in order to compute the length of hurricane tracks
- -->
+-->
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-    </head>
-    <body>
-        <script type="text/javascript" src="hurricaneData.js"></script>
-        <script type="text/javascript">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <script type="text/javascript" src="hurricaneData.js"></script>
+    <script type="text/javascript">
 
 // ======================= PRE-PROVIDED FUNCTIONS FROM ASSIGNMENT =================================== 
-            (function () { // Wrapping everything in IIFE
+        (function () { // Wrapping everything in IIFE
             // https://www.movable-type.co.uk/scripts/latlong.html
             // Extend Number object with methods to convert between degrees & radians
             Number.prototype.toRadians = function() { return this * Math.PI / 180; };
@@ -22,12 +22,12 @@ Description: This file demonstrates the use of array methods map and reduce in o
 
             // Compute distance in meters using the spherical law of cosines formula.
             function distance(lat1, lon1, lat2, lon2) {
-                 var φ1 = lat1.toRadians(), φ2 = lat2.toRadians(), Δλ = (lon2-lon1).toRadians(), R = 6371e3;
-                 return Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
-             }
+               var φ1 = lat1.toRadians(), φ2 = lat2.toRadians(), Δλ = (lon2-lon1).toRadians(), R = 6371e3;
+               return Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
+           }
 
 // ===================================================================================================
-            
+
             function trackLength(data) {     // Defining a function called trackLength that takes in each hurricane's data
                 let totalDist = 0;          // Creating variable that will hold the total distance calculated
 
@@ -37,11 +37,11 @@ Description: This file demonstrates the use of array methods map and reduce in o
 
                 let reduction = latLong.reduce( function(prev, val, idx) {   // Using reduce to recursively calculate the distance
                 // The distance is the totalDistance thus far summed with the incremental disance calculated using the provided distance function
-                    totalDist = totalDist + (distance(prev.lat, prev.lon, val.lat, val.lon)); 
+                totalDist = totalDist + (distance(prev.lat, prev.lon, val.lat, val.lon)); 
                     return val;     // Returning val so that it may be used as the next "prev" for the function
-                 });
+                });
                  return(totalDist/1609.344);    // After reduce is completed, the total distance should be returned (converted to miles)
-            }
+             }
 
             // Mapping hurricane data so that the name and length of each hurricane is returned. Lenght is calculated using
             // the defined trackLength function above
@@ -51,7 +51,7 @@ Description: This file demonstrates the use of array methods map and reduce in o
             console.log(hurricaneArray);     // Printing out the hurricaneArray that is calculated
 
         }) ();      // Finish wrapping everything in IIFE
-        </script>
-    </body>
+    </script>
+</body>
 </html>
 
