@@ -1,0 +1,94 @@
+<!-- 
+My Name: Daniel Hanna
+File Name: project4_start.html
+Description: This file demonstrates the use of workers in order to process image data
+-->
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Project 4</title>
+    <style>
+        * { font-family: Arial; }
+        div { margin: 5px; }
+    </style>
+</head>
+<body>
+    <div>
+        Image:
+        <select id="imagep">
+            <option value="">(Select Image)</option>      <!-- Added a (Select Image) menu choice that has nothing chosen by default -->
+            <option value="coins.jpg">coins.jpg</option>
+            <option value="grainy.png">grainy.png</option>
+            <option value="sausalito.jpg">sausalito.jpg</option>
+            <option value="galaxy.jpg">galaxy.jpg</option>
+            <option value="nyc.jpg">nyc.jpg</option>
+        </select>
+        <button id="bLoadImage">Reset</button>
+        | # Workers: <input type="range" id="nworkers" min="1" max="8" value="1" style="height:10px;"><span id="sNWorkers">1</span>
+        | <button id="bProcess">Process</button>
+    </div>
+    <div>
+        Elapsed time: <span id="out"></span></div>
+    </div>
+    <div>
+        <canvas id="cvs"></canvas>
+    </div>
+
+    <script type="text/javascript">
+        (function() {                       // Wrapping everything in an IIFE
+            let cvs     = document.getElementById("cvs");       // Creating variable that holds the CVS DOM element
+            let ctx     = cvs.getContext('2d');                 // The CVS element has a 2D context
+            let workers = [];                                   // The workers array will hold all of the workers 
+            document.getElementById("imagep").onchange = function(e) {      // On selection change, the picture needs to be drawn on the canvas
+                let imageSelection = document.getElementById("imagep").value;  
+                let image = new Image(); 
+                image.src = imageSelection;                     // Picture source will match the drop menu selection
+
+                image.onload = function(e) {                // On picture load, the canvas should be resized to the size of the picture
+                    cvs.width = image.width; 
+                    cvs.height = image.height; 
+                    ctx.drawImage(image, 0, 0);             // The image needs to be drawin onto the page
+                }
+            }
+
+            document.getElementById("nworkers").onchange = function(e) {    // The number of workers should shown on the page (based on slider)
+                document.getElementById("sNWorkers").innerHTML = document.getElementById("nworkers").value;
+            }
+
+            document.getElementById("bProcess").onclick = function(e) {   // The following actions should take place when process button is clicked
+                workers = [];                           // Ensure that worker array is empty (so there's no extra unneeded workers)
+                let imageDataArray = [];            // Creating a image data array (will house all the data needed for the worker)
+                let stripHeight = Math.ceil(cvs.height / document.getElementById("sNWorkers").innerHTML); // Performing provided calculation for height of strips
+                document.getElementById("out").innerHTML = "";      // Resetting the Elapsed Time count (so old values don't stay on screen)
+
+                for (let i = 0; i < Number(document.getElementById("sNWorkers").innerHTML); i++) {  // These actions should occur for as many workers as the user desires
+                    let w = new Worker('process_start.js');     // Creating a new worker w
+                    w.onmessage = function(e) {             // When the worker receives a message, they should perform these actions
+                        ctx.putImageData(e.data.imdata, e.data.x, e.data.y, 1, 1,e.data.imdata.width, e.data.imdata.height-2);  // the image data should be placed. The 7 parameter version of putImageData is used
+                        document.getElementById("out").innerHTML = e.data.elapsed/1000 + " seconds"; // The elapsed time should be updated 
+                        w.terminate();      // The worker should be terminated
+                        console.log("Workers terminated");  // The console should be used to notify that workers have been terminated 
+                    } 
+
+                    workers.push(w);    // Add the worker to the workers array
+                }
+
+                for (let j = 0; j < cvs.height; j += stripHeight) { // This loop will be used to split up the image data appropiately
+                    let imageData = ctx.getImageData(0, j, cvs.width, stripHeight+2);   // imageData variable will hold the image data for the specified amount
+                    let newImageData = {imdata: imageData, x: 0, y: j, height: stripHeight, elapsed: 0};    // newImageData will be an object containing image data, x, y, height, and time elapsed
+                    imageDataArray.push(newImageData);  // The newImageData should be pushed into the image data array
+                }
+                
+                for (let k = 0; k < imageDataArray.length; k++) {   // The loop will be used to divvy up the work amongst the workers
+                    workers[k].postMessage(imageDataArray[k]);
+                } 
+            }
+            document.getElementById("bLoadImage").onclick = function() {    // This is a lazy man's way of resetting the page
+                window.location.reload();       // Clicking the Reset button will reload the page (essentially resetting it to the starting state)
+            }  
+        })();       // Finish wrapping everything into an IIFE
+    </script>
+</body>
+</html>
